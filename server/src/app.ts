@@ -5,6 +5,7 @@ import { ENV } from "./config/env";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import { errorHandler } from "./middleware/error.middleware";
+import authRoutes from "./routes/auth.routes";
 
 /**
  * Express Application Factory
@@ -50,13 +51,14 @@ const createApp = (): Application => {
     });
 
     //  API Routes-----------------------------------------------------------------------------
+    app.use("/api/auth/", authRoutes)
 
 
     //  404 Handler----------------------------------------------------------------------------
     app.use((_req: Request, res: Response) => {
         res.status(404).json({
             success: false,
-            messag: "Route not found!"
+            message: "Route not found!"
         })
     });
 

@@ -17,9 +17,9 @@ export interface IPatient extends Document {
     phone: string;
     email?: string;
     dateOfBirth?: Date;
-    gender: "male" | "female";
+    gender?: "male" | "female";
     allergies: string[];
-    bloodGroup: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
+    bloodGroup?: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
     address?: string;
     createdAt: Date;
     updatedAt: Date;
@@ -40,7 +40,7 @@ const PatientSchema = new Schema<IPatient>(
         },
         phone: {
             type: String,
-            require: true,
+            required: true,
             unique: true,
             trim: true
         },
@@ -52,7 +52,6 @@ const PatientSchema = new Schema<IPatient>(
         },
         dateOfBirth: {
             type: Date,
-            required: [true, "Date of birth is required"]
         },
         gender: {
             type: String,
@@ -71,7 +70,6 @@ const PatientSchema = new Schema<IPatient>(
                 values: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
                 message: "Invalid blood group"
             },
-            required: [true, "Blood group required"],
             trim: true
         },
         address: {
@@ -83,7 +81,7 @@ const PatientSchema = new Schema<IPatient>(
 );
 
 //  Index for fast phone lookup(used in guest booking + assistant search)
-PatientSchema.index({ phone: 1 });
+// PatientSchema.index({ phone: 1 }); THIS ALREADY HANDLED IN PHONE: UNIQUE AS TRUE
 PatientSchema.index({ name: "text" }); // Text index for search by name
 
 export const Patient = mongoose.model<IPatient>("Patient", PatientSchema);
