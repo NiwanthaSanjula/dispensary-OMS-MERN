@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+@import "tailwindcss";
+
+@theme {
+    /* Main green — CTAs, active states*/
+    --color-primary: #33CC33;
+    /* Blue — secondary actions, links, AI buttons*/
+    --color-accent: #0066FF;
+    /* Near black — sidebar, headings*/
+    --color-dark: #1A1A1A;
+    /* Green hover state*/
+    --color-primary-dark: #1E8C1E;
+    /* Green background tint*/
+    --color-primary-light: #E8F9E8;
+    /* Blue background tint*/
+    --color-accent-light: #E8F0FF;
+    /* Borders, dividers*/
+    --color-gray-border: #E2E8F0;
+    /* Secondary text*/
+    --color-gray-text: #555555;
+    /* Page background*/
+    --color-gray-bg: #F7F8FA;
+    /* Low stock, warnings*/
+    --color-warning: #E07B00;
+    /* Errors, allergy warnings*/
+    --color-danger: #CC2222;
+    /* Error background tint*/
+    --color-danger-light: #FDECEA;
+
+
+    --font-BabesNeue: 'Bebas Neue', sans-serif;
+}
+
+@layer base {
+    body {
+        @apply bg-gray-bg text-dark
+    }
+
+    /* Custom scrollbar*/
+    ::-webkit-scrollbar {
+        @apply w-1.5;
+    }
+
+    ::-webkit-scrollbar-track {
+        @apply bg-gray-bg;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        @apply bg-primary rounded-full;
+    }
+}
+
+@utility btn-primary {
+    @apply bg-primary hover:bg-primary-dark text-white font-semibold px-4 py-2.5 rounded-lg transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed;
+}
+
+@utility btn-secondary {
+    @apply bg-accent hover:bg-blue-700 text-white font-semibold px-4 py-2.5 rounded-lg transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed;
+}
+
+@utility btn-outlined {
+    @apply border border-accent text-accent hover:bg-accent-light font-semibold px-4 py-2.5 rounded-lg transition-colors duration-200;
+}
+
+@utility btn-danger {
+    @apply bg-danger hover:bg-red-800 text-white font-semibold px-4 py-2.5 rounded-lg transition-colors duration-200;
+}
+
+@utility input-field {
+    @apply w-full px-3.5 py-2.5 border border-gray-border rounded-lg text-dark text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent-light transition-all duration-200;
+}
+
+@utility input-label {
+    @apply block text-sm font-semibold text-dark mb-1.5;
+}
+
+@utility card {
+    @apply bg-white rounded-xl border border-gray-border shadow-sm p-5;
+}
+
+/* Status badges */
+@utility badge-waiting {
+    @apply bg-gray-border text-gray-text text-xs font-medium px-2.5 py-1 rounded-full;
+}
+
+@utility badge-serving {
+    @apply bg-primary-light text-primary-dark text-xs font-semibold px-2.5 py-1 rounded-full;
+}
+
+@utility badge-completed {
+    @apply bg-gray-bg text-gray-400 text-xs font-medium px-2.5 py-1 rounded-full;
+}
+
+@utility badge-noshow {
+    @apply bg-danger-light text-danger text-xs font-medium px-2.5 py-1 rounded-full;
+}
+
+@utility badge-cancelled {
+    @apply bg-orange-50 text-warning text-xs font-medium px-2.5 py-1 rounded-full;
+}
+
+
+/* Page layouts */
+@utility page-container {
+    @apply flex h-screen bg-gray-bg overflow-hidden;
+}
+
+@utility main-content {
+    @apply flex-1 overflow-y-auto p-6;
+}
+
+@utility page-title {
+    @apply text-xl font-bold text-dark mb-1;
+}
+
+@utility section-title {
+    @apply text-base font-semibold text-dark mb-3;
+}
