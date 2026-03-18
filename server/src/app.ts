@@ -6,6 +6,8 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import { errorHandler } from "./middleware/error.middleware";
 import authRoutes from "./routes/auth.routes";
+import queueRoutes from "./routes/queue.routes";
+
 
 /**
  * Express Application Factory
@@ -52,6 +54,27 @@ const createApp = (): Application => {
 
     //  API Routes-----------------------------------------------------------------------------
     app.use("/api/auth/", authRoutes)
+    app.use("/api/queue/", queueRoutes)
+
+
+
+    /*app.get("/api/seed-settings", async (_req, res) => {
+        const { Settings } = await import("./models/Setting.model");
+        const existing = await Settings.findOne();
+        if (!existing) {
+            await Settings.create({
+                dispensaryName: "Demo Dispensary",
+                doctorName: "Dr.Unknown",
+                openningTime: "09:00",
+                closingTime: "17:00",
+                avgConsultationMinutes: 20,
+                maxDailyLimit: 40,
+                advanceBookingDays: 7,
+            });
+        }
+        res.json({ message: "Settings seeded" })
+    })*/
+
 
 
     //  404 Handler----------------------------------------------------------------------------
