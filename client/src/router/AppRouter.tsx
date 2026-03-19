@@ -3,6 +3,11 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { type UserRole } from "../types/user.types";
 
+
+// Layouts_______________________________________________________________________________________________
+import DashboardLayout from "../layouts/DashboardLayout";
+import PatientLayout from "../layouts/PatientLayout";
+
 // Public Page__________________________________________________________________________________________
 import GuestBooking from "../pages/public/GuestBooking";
 import Landing from "../pages/public/Landing";
@@ -46,7 +51,9 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
     const { isAuthenticated, isLoading } = useAuth();
 
     if (isLoading) return null;
-    return isAuthenticated ? <>{children}</> : <Navigate to="/auth/login" replace />;
+    return isAuthenticated
+        ? <>{children}</>
+        : <Navigate to="/auth/login" replace />;
 };
 
 /**
@@ -91,7 +98,37 @@ export const RedirectByRole = () => {
     return <Navigate to={dashboardMap[user.role]} replace />
 };
 
+/**
+ * Helper - wraps a doctor/assistant page with DashboardLayout
+ */
+const DashboardRoute = ({
+    children,
+    allowedRoles
+}: {
+    children: ReactNode;
+    allowedRoles: UserRole[];
+}) => (
+    <ProtectedRoute>
+        <RoleGuard allowedRoles={allowedRoles}>
+            <DashboardLayout>
+                {children}
+            </DashboardLayout>
+        </RoleGuard>
+    </ProtectedRoute>
+)
 
+/**
+ * Helper - wraps a patient page with PatientLayout
+ */
+const PatientRoute = ({ children }: { children: ReactNode }) => (
+    <ProtectedRoute>
+        <RoleGuard allowedRoles={["patient"]}>
+            <PatientLayout>
+                {children}
+            </PatientLayout>
+        </RoleGuard>
+    </ProtectedRoute>
+)
 
 /**
  * AppRouter
@@ -111,122 +148,94 @@ const AppRouter = () => {
                 <Route path="/auth/register" element={<Register />} />
 
                 {/** -------- Shared Routes ( Doctor + Assistant) -------- **/}
-                <Route path="/assistant/patients" element={
-                    <ProtectedRoute>
-                        <RoleGuard allowedRoles={["doctor", "assistant"]} >
-                            <PatientManagement />
-                        </RoleGuard>
-                    </ProtectedRoute>
+                <Route path="/management/patients" element={
+                    <DashboardRoute allowedRoles={["doctor", "assistant"]}>
+                        <PatientManagement />
+                    </DashboardRoute>
                 } />
 
-                <Route path="/assistant/inventory" element={
-                    <ProtectedRoute>
-                        <RoleGuard allowedRoles={["doctor", "assistant"]} >
-                            <Inventory />
-                        </RoleGuard>
-                    </ProtectedRoute>
+                <Route path="/management/inventory" element={
+                    <DashboardRoute allowedRoles={["doctor", "assistant"]}>
+                        <Inventory />
+                    </DashboardRoute>
                 } />
 
-                <Route path="/assistant/appointments" element={
-                    <ProtectedRoute>
-                        <RoleGuard allowedRoles={["doctor", "assistant"]} >
-                            <Appointments />
-                        </RoleGuard>
-                    </ProtectedRoute>
+                <Route path="/management/appointments" element={
+                    <DashboardRoute allowedRoles={["doctor", "assistant"]}>
+                        <Appointments />
+                    </DashboardRoute>
                 } />
 
 
                 {/** -------------------- Doctor Routes -------------------- **/}
                 <Route path="/doctor/dashboard" element={
-                    <ProtectedRoute>
-                        <RoleGuard allowedRoles={["doctor"]} >
-                            <DoctorDashboard />
-                        </RoleGuard>
-                    </ProtectedRoute>
+                    <DashboardRoute allowedRoles={["doctor"]}>
+                        <DoctorDashboard />
+                    </DashboardRoute>
                 } />
-
                 <Route path="/doctor/consultation/:id" element={
-                    <ProtectedRoute>
-                        <RoleGuard allowedRoles={["doctor"]} >
-                            <Consultation />
-                        </RoleGuard>
-                    </ProtectedRoute>
+                    <DashboardRoute allowedRoles={["doctor"]}>
+                        <Consultation />
+                    </DashboardRoute>
                 } />
 
                 <Route path="/doctor/patients" element={
-                    <ProtectedRoute>
-                        <RoleGuard allowedRoles={["doctor"]} >
-                            <PatientList />
-                        </RoleGuard>
-                    </ProtectedRoute>
+                    <DashboardRoute allowedRoles={["doctor"]}>
+                        <PatientList />
+                    </DashboardRoute>
                 } />
 
                 <Route path="/doctor/patients/:id" element={
-                    <ProtectedRoute>
-                        <RoleGuard allowedRoles={["doctor"]} >
-                            <PatientProfile />
-                        </RoleGuard>
-                    </ProtectedRoute>
+                    <DashboardRoute allowedRoles={["doctor"]}>
+                        <PatientProfile />
+                    </DashboardRoute>
                 } />
 
                 <Route path="/doctor/settings" element={
-                    <ProtectedRoute>
-                        <RoleGuard allowedRoles={["doctor"]} >
-                            <DoctorSettings />
-                        </RoleGuard>
-                    </ProtectedRoute>
+                    <DashboardRoute allowedRoles={["doctor"]}>
+                        <DoctorSettings />
+                    </DashboardRoute>
                 } />
 
                 {/** -------------------- Assistant Routes -------------------- **/}
                 <Route path="/assistant/dashboard" element={
-                    <ProtectedRoute>
-                        <RoleGuard allowedRoles={["assistant"]} >
-                            <AssistantDashboard />
-                        </RoleGuard>
-                    </ProtectedRoute>
+                    <DashboardRoute allowedRoles={["assistant"]}>
+                        <AssistantDashboard />
+                    </DashboardRoute>
                 } />
-
 
 
                 {/** -------------------- Patients Routes -------------------- **/}
                 <Route path="/patient/dashboard" element={
-                    <ProtectedRoute>
-                        <RoleGuard allowedRoles={["patient"]} >
-                            <PatientDashboard />
-                        </RoleGuard>
-                    </ProtectedRoute>
+                    <PatientRoute>
+                        <PatientDashboard />
+                    </PatientRoute>
                 } />
 
                 <Route path="/patient/book" element={
-                    <ProtectedRoute>
-                        <RoleGuard allowedRoles={["patient"]} >
-                            <BookAppointment />
-                        </RoleGuard>
-                    </ProtectedRoute>
+                    <PatientRoute>
+                        <BookAppointment />
+                    </PatientRoute>
                 } />
 
                 <Route path="/patient/appointments" element={
-                    <ProtectedRoute>
-                        <RoleGuard allowedRoles={["patient"]} >
-                            <MyAppointments />
-                        </RoleGuard>
-                    </ProtectedRoute>
+                    <PatientRoute>
+                        <MyAppointments />
+                    </PatientRoute>
                 } />
+
                 <Route path="/patient/prescriptions" element={
-                    <ProtectedRoute>
-                        <RoleGuard allowedRoles={["patient"]} >
-                            <MyPrescriptions />
-                        </RoleGuard>
-                    </ProtectedRoute>
+                    <PatientRoute>
+                        <MyPrescriptions />
+                    </PatientRoute>
                 } />
 
                 <Route path="/patient/symptom-check" element={
-                    <ProtectedRoute>
-                        <RoleGuard allowedRoles={["patient"]} >
-                            <SymptomCheck />
-                        </RoleGuard>
-                    </ProtectedRoute>
+                    <PatientRoute>
+                        <SymptomCheck />
+                    </PatientRoute>
                 } />
+
 
                 {/** ---- Redirect / dashboard -> role-specific dashboard ---- **/}
                 <Route path="/dashboard" element={
