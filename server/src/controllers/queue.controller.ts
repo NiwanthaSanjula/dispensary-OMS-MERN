@@ -103,13 +103,13 @@ export const getLiveQueue = asyncHandler(async (req: Request, res: Response) => 
     const waitingAppointments = await Appointment.find({
         date: { $gte: today, $lte: endOfDay },
         status: "waiting",
-    })
-        .sort({ tokenNumber: 1 }).limit(5).select("tokenCode tokenNumber estimatedTime");
+    }).sort({ tokenNumber: 1 }).limit(5).select("tokenCode tokenNumber estimatedTime");
 
     const waitingCount = await Appointment.countDocuments({
         date: { $gte: today, $lte: endOfDay },
         status: "waiting",
     });
+
 
     res.status(200).json(
         new ApiResponse("Live queue data fetched", {
@@ -134,7 +134,7 @@ export const getLiveQueue = asyncHandler(async (req: Request, res: Response) => 
 export const issueQueueToken = asyncHandler(async (req: Request, res: Response) => {
     const { patientId, date, type, notes } = req.body;
 
-    console.log(patientId, date, type);
+    //console.log(patientId, date, type);
 
 
     if (!patientId || !date || !type) {
@@ -142,6 +142,7 @@ export const issueQueueToken = asyncHandler(async (req: Request, res: Response) 
     }
 
     if (!["online", "manual"].includes(type)) {
+        200
         throw new ApiError(400, "type must be online or manual");
     }
 
@@ -200,7 +201,7 @@ export const advanceQueue = asyncHandler(async (req: Request, res: Response) => 
     const nextAppointment = await Appointment.findOne({
         date: { $gte: today, $lte: endOfDay },
         status: "waiting",
-    }).sort({ tokennumber: 1 }).populate("patientId", "name phone allergies");
+    }).sort({ tokenNumber: 1 }).populate("patientId", "name phone allergies");
 
     if (!nextAppointment) {
         // No more waiting patients - close the queue
@@ -210,7 +211,7 @@ export const advanceQueue = asyncHandler(async (req: Request, res: Response) => 
         //Emit socket event
         const io = req.app.get("io");
         if (io) {
-            io.emit("queue: closed", {
+            io.emit("queue:closed", {
                 message: "All patients have been seen.Queue is now closed."
             });
         }
@@ -246,7 +247,8 @@ export const advanceQueue = asyncHandler(async (req: Request, res: Response) => 
         io.emit("queue:updated", {
             currentToken: queue.currentToken,
             waitingCount,
-            queue: allAppointments
+            queue: allAppointments,
+            status: queue.status
         });
     }
 
@@ -313,7 +315,7 @@ export const resumeQueue = asyncHandler(async (req: Request, res: Response) => {
         status: "waiting",
     });
 
-    const allAppointments = await Appointment.countDocuments({
+    const allAppointments = await Appointment.find({
         date: { $gte: today, $lte: endOfDay },
     }).populate("patientId", "name phone").sort({ tokenNumber: 1 });
 
@@ -324,6 +326,7 @@ export const resumeQueue = asyncHandler(async (req: Request, res: Response) => {
             currentToken: queue.currentToken,
             waitingCount,
             queue: allAppointments,
+            status: "open"
         });
     }
 

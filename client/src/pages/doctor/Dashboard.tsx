@@ -8,6 +8,9 @@ import type { IAppointment, AppointmentStatus } from '../../types/appointment.ty
 
 import { GiPlayerNext } from "react-icons/gi";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
+import { FaArrowRight, FaPause } from "react-icons/fa";
+import { TbTriangleFilled } from "react-icons/tb";
+import { MdDoorSliding } from "react-icons/md";
 
 /**
  * Doctor Dashboard
@@ -17,7 +20,7 @@ import { TbPlayerTrackNextFilled } from "react-icons/tb";
 
 const Dashboard = () => {
     const navigate = useNavigate();
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
     const {
         queue,
         appointments,
@@ -30,8 +33,11 @@ const Dashboard = () => {
     } = useQueue();
 
     const [isCallingNext, setIsCallingNext] = useState(false);
+    const [isActioning, setIsActioning] = useState(false);
     const [actionError, setActionError] = useState("");
 
+
+    // Handlers_____________________________________________________________________________________________
     const handleCallNext = async () => {
         setIsCallingNext(true);
         setActionError("");
@@ -49,6 +55,51 @@ const Dashboard = () => {
         }
     };
 
+    const handlePause = async () => {
+        setIsActioning(true);
+
+        try {
+            await queueService.pause();
+        } catch (err: unknown) {
+            const e = err as { response?: { data?: { message?: string } } };
+            setActionError(e.response?.data?.message || "Failed to pause queue");
+        } finally {
+            setIsActioning(false)
+        }
+    };
+
+    const handleResume = async () => {
+        setIsActioning(true);
+
+        try {
+            await queueService.resume();
+        } catch (err: unknown) {
+            const e = err as { response?: { data?: { message?: string } } };
+            setActionError(e.response?.data?.message || "Failed to Resume queue");
+        } finally {
+            setIsActioning(false)
+        }
+    };
+
+    const handleClose = async () => {
+
+        const confirmed = window.confirm(
+            "Are you sure you want to close the queue for today?"
+        );
+        if (!confirmed) return;
+
+        setIsActioning(true);
+        try {
+            await queueService.close();
+        } catch (err: unknown) {
+            const e = err as { response?: { data?: { message?: string } } };
+            setActionError(e.response?.data?.message || "Failed to close queue");
+        } finally {
+            setIsActioning(false)
+        }
+    };
+
+    // Components___________________________________________________________________________________________
     const StatusBadge = ({ status }: { status: AppointmentStatus }) => {
         const classes: Record<AppointmentStatus, string> = {
             waiting: "badge-waiting",
@@ -99,16 +150,20 @@ const Dashboard = () => {
 
                 {/* Queue status pill */}
                 <div
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium 
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2
                         ${queue?.status === "open"
                             ? "bg-primary-light text-primary-dark"
                             : queue?.status === "paused"
                                 ? "bg-orange-50 text-warning"
                                 : "bg-gray-bg text-gray-text"
-                        }`}>
-                    {queue?.status === "open" ? "🟢 Queue Open" :
-                        queue?.status === "paused" ? "⏸ Queue Paused" :
-                            queue ? "🔴 Queue Closed" : "Queue not Initialized"}
+                        }`}
+                >
+                    <div className={`w-2 h-2 rounded-full ${queue?.status === "open" ? "bg-green-500 animate-ping" : queue?.status === "paused" ? "bg-orange-500" : "bg-gray-500"}`} />
+
+
+                    {queue?.status === "open" ? "Queue Open" :
+                        queue?.status === "paused" ? "Queue Paused" :
+                            queue ? "Queue Closed" : "Queue not Initialized"}
 
                 </div>
             </div>
@@ -128,11 +183,19 @@ const Dashboard = () => {
                     { label: "Waiting", value: waitingCount, color: "warning" },
                     { label: "No Show", value: noShowCount, color: "danger" },
                 ].map((stat) => {
+
+                    const colors: Record<string, string> = {
+                        accent: "border-l-accent",
+                        primary: "border-l-primary",
+                        warning: "border-l-warning",
+                        danger: "border-l-danger",
+                    };
+
                     return (
 
                         <div
                             key={stat.label}
-                            className={`border border-gray-200 rounded-lg shadow border-l-3 border-l-${stat.color} px-4 py-3`}
+                            className={`border border-gray-200 bg-white rounded-lg shadow-md border-l-3 ${colors[stat.color]} px-4 py-3`}
                         >
                             <p className={`text-4xl font-BabesNeue text-${stat.color}`}>
                                 {stat.value}
@@ -145,6 +208,40 @@ const Dashboard = () => {
                     )
                 })}
             </div>
+
+            {/* --- Queue Controllers --- */}
+            {queue && queue.status !== 'closed' && (
+                <div className='flex items-center gap-3 mb-4 card'>
+                    {queue.status === "open" ? (
+                        <button
+                            onClick={handlePause}
+                            disabled={isActioning}
+                            className='btn-outlined flex items-center gap-2 text-sm'
+                        >
+                            <FaPause />
+                            Pause Queue
+                        </button>
+                    ) : queue.status === "paused" ? (
+                        <button
+                            onClick={handleResume}
+                            disabled={isActioning}
+                            className='btn-outlined border-warning text-warning flex items-center gap-2 text-sm'
+                        >
+                            < TbTriangleFilled className='rotate-90' />
+                            Resume Queue
+                        </button>
+                    ) : null}
+
+                    <button
+                        onClick={handleClose}
+                        disabled={isActioning}
+                        className='btn-danger flex items-center gap-2 text-sm'
+                    >
+                        <MdDoorSliding />
+                        Close Queue
+                    </button>
+                </div>
+            )}
 
             {/* --- Queue Table --- */}
             <div className='card'>
@@ -191,13 +288,93 @@ const Dashboard = () => {
                     </div>
                 ) : (
                     /* Table */
-                    <div>
+                    <div className='overflow-x-auto'>
+                        <table className='w-full text-sm'>
+                            <thead>
+                                <tr className='border-b border-gray-border'>
+                                    {["Token", "Patient", "Type", "Est.Time", "Status", "Action"].map(
+                                        (header) => (
+                                            <th
+                                                key={header}
+                                                className='text-left text-xs font-bold text-gray-text pb-3 pr-4'
+                                            >
+                                                {header}
+                                            </th>
+                                        )
+                                    )}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {appointments.map((appt: IAppointment) => {
+                                    const isServing = appt.status === "serving";
+                                    const patient = appt.patientId as unknown as {
+                                        name: string; phone: string
+                                    };
 
+                                    return (
+                                        <tr
+                                            key={appt._id}
+                                            className={`transition-colors 
+                                                ${isServing
+                                                    ? "bg-primary-light border-l-4 border-l-primary"
+                                                    : "hover:bg-gray-bg"
+                                                }
+                                            `}
+                                        >
+                                            {/* Token */}
+                                            <td className='py-3 pl-2 pr-4'>
+                                                <span className='font-mono font-bold text-dark'>
+                                                    {appt.tokenCode}
+                                                </span>
+                                            </td>
+
+                                            {/* Patient */}
+                                            <td className='py-3 pr-4'>
+                                                <p className='font-medium text-dark'>
+                                                    {patient?.name || "Unknown"}
+                                                </p>
+                                                <p className='text-gray-text text-xs'>
+                                                    {patient?.phone || ""}
+                                                </p>
+                                            </td>
+
+                                            {/* Type */}
+                                            <td className='py-3 pr-4'>
+                                                <TypeBadge type={appt.type} />
+                                            </td>
+
+                                            {/* Est time */}
+                                            <td className='py-3 pr-4 text-gray-text'>
+                                                {appt.estimatedTime}
+                                            </td>
+
+                                            {/* Status */}
+                                            <td className='py-3 pr-4'>
+                                                <StatusBadge status={appt.status} />
+                                            </td>
+
+                                            {/* Action */}
+                                            <td className='py-3'>
+                                                {isServing ? (
+                                                    <button
+                                                        onClick={() => navigate(`/doctor/consultation/${appt._id}`)}
+                                                        className='btn-secondary flex items-center gap-2 text-xs'
+                                                    >
+                                                        Start Consultation
+                                                        < FaArrowRight size={16} />
+                                                    </button>
+                                                ) : (
+                                                    <span className='text-gray-text text-xs'>-</span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
                     </div>
                 )}
-
             </div>
-
         </div>
     )
 }

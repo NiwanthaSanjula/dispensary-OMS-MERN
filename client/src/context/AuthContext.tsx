@@ -44,6 +44,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setIsLoading(false);
     }, []);
 
+    useEffect(() => {
+        const handleForcedLogout = () => {
+            setAccessToken(null);
+            setUser(null);
+        };
+        window.addEventListener("auth:logout", handleForcedLogout);
+        return () => window.removeEventListener("auth:logout", handleForcedLogout);
+    }, []);
+
 
     /**
      * login - called after successfull /api/auth/login or /api/auth/register

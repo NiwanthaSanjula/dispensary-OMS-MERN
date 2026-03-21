@@ -79,7 +79,7 @@ const queueService = {
      * Triggers Socket.io queue:updated on backend
      */
     callNext: async (): Promise<void> => {
-        await api.put("/put/next");
+        await api.put("/queue/next");
     },
 
     /**

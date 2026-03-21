@@ -62,7 +62,11 @@ export const useQueue = () => {
         const handleQueueUpdated = (data: IQueueUpdate) => {
             setAppointments(data.queue as unknown as IAppointment[]);
             setQueue((prev) =>
-                prev ? { ...prev, currentToken: data.currentToken } : prev
+                prev ? {
+                    ...prev,
+                    currentToken: data.currentToken,
+                    status: data.status || "open"
+                } : prev
             );
         };
 
@@ -97,10 +101,10 @@ export const useQueue = () => {
     }, [socket])
 
     // Derived state - computed from appointments array
-    const waitingCount = appointments.filter((a) => a.status === "waiting").length;
-    const completedCount = appointments.filter((a) => a.status === "completed").length;
-    const servingAppt = appointments.find((a) => a.status === "serving");
-    const noShowCount = appointments.filter((a) => a.status === "noshow").length;
+    const waitingCount = (appointments || []).filter((a) => a.status === "waiting").length;
+    const completedCount = (appointments || []).filter((a) => a.status === "completed").length;
+    const servingAppt = (appointments || []).find((a) => a.status === "serving");
+    const noShowCount = (appointments || []).filter((a) => a.status === "noshow").length;
 
     return {
         queue,

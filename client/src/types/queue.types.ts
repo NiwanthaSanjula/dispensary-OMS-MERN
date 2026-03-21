@@ -18,4 +18,5 @@ export interface IQueueUpdate {
     currentToken: number;
     waitingCount: number;
     queue: import("./appointment.types").IAppointment[];
+    status: QueueStatus;
 }

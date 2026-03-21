@@ -16,6 +16,19 @@ const api = axios.create({
     },
 });
 
+
+/**
+ * [CHANGED] Dedicated axios instance for the refresh call only.
+ * Using the main `api` instance caused the response interceptor to catch
+ * a 401 from /auth/refresh itself and trigger another refresh → infinite loop.
+ * This plain instance has no interceptors attached, so it fails cleanly.
+*/
+const refreshApi = axios.create({
+    baseURL: import.meta.env.VITE_API_URL + "/api",
+    withCredentials: true,  // Still needs credentials to send the httpOnly cookie
+});
+
+
 /**
  * Request interceptor
  * Reads access token from localStorage and attaches it to every request
@@ -88,7 +101,7 @@ api.interceptors.response.use(
 
             try {
                 //  Attempt to refresh using httpOnly cookie
-                const { data } = await api.post("/auth/refresh");
+                const { data } = await refreshApi.post("/auth/refresh");
                 const newToken = data.data.accessToken;
 
                 localStorage.setItem("accessToken", newToken);
@@ -102,6 +115,14 @@ api.interceptors.response.use(
                 processQueue(refreshError, null);
                 localStorage.removeItem("accessToken");
                 localStorage.removeItem("user");
+
+                // [CHANGED] Dispatch a custom event so AuthContext can clear its
+                // in-memory state (user, accessToken) before the redirect fires.
+                // Without this, React state stays stale and ProtectedRoute still
+                // sees isAuthenticated=true on the next render cycle.
+                window.dispatchEvent(new Event("auth:logout"));
+
+
                 window.location.href = "/auth/login";
                 return Promise.reject(refreshError);
 

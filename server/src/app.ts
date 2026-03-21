@@ -27,7 +27,8 @@ const createApp = (): Application => {
     app.use(cors({
         origin: ENV.CLIENT_URL,
         credentials: true,  //  Required for httpOnly cookie (refresh token)
-        methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
     }));
 
     // Parsing Middleware----------------------------------------------------------------------
