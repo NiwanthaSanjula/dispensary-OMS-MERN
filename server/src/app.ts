@@ -7,6 +7,9 @@ import morgan from "morgan";
 import { errorHandler } from "./middleware/error.middleware";
 import authRoutes from "./routes/auth.routes";
 import queueRoutes from "./routes/queue.routes";
+import patientRoutes from './routes/patient.routes'
+import appointmentRoutes from './routes/appointment.routes'
+
 
 
 /**
@@ -56,6 +59,9 @@ const createApp = (): Application => {
     //  API Routes-----------------------------------------------------------------------------
     app.use("/api/auth/", authRoutes)
     app.use("/api/queue/", queueRoutes)
+    app.use("/api/patients", patientRoutes)
+    app.use("/api/appointments", appointmentRoutes)
+
 
 
 
