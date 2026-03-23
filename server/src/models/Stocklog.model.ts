@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema, SchemaType } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 
 /**
  * Stocklog Interface
@@ -37,7 +37,7 @@ const StockLogSchema = new Schema<IStocklog>(
         quantity: {
             type: Number,
             required: [true, "Quantity is required"],
-            min: [0, "Quantity must be at leadt 1"]
+            min: [1, "Quantity must be at least 1"]
         },
         reason: {
             type: String,

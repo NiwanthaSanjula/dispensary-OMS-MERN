@@ -8,7 +8,7 @@ export interface TodayQueueResponse {
 }
 
 export interface LiveQueueResponse {
-    curretToken: number;
+    currentToken: number;
     currentTokenCode: string | null;
     waitingCount: number;
     status: string;

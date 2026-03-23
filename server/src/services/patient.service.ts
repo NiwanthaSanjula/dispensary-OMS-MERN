@@ -43,6 +43,15 @@ const patientService = {
         return await Patient.find(filter).sort({ createdAt: -1 }).limit(100);
     },
 
+    /**
+     * Get patient record linked to a user account
+     * Used by patient portal — each patient fetches their own record
+     */
+    getMyProfile: async (userId: string) => {
+        const patient = await Patient.findOne({ userId });
+        if (!patient) throw new ApiError(404, "Patient profile not found");
+        return patient;
+    },
 
     /**
      * Get single patient by Id

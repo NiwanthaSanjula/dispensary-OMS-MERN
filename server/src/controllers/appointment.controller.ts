@@ -9,7 +9,11 @@ export const getAppointments = asyncHandler(async (req: Request, res: Response) 
         date: date as string | undefined,
         status: status as string | undefined,
         patientId: patientId as string | undefined,
-    });
+    },
+        req.user!._id,
+        req.user!.role
+
+    );
     res.status(200).json(new ApiResponse("Appointments fateched", appointments));
 });
 

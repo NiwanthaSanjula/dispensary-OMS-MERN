@@ -11,7 +11,7 @@ const router = Router();
 
 router.use(verifyJWT);
 
-router.get("/", authorizeRoles("doctor", "assistant"), getAppointments);
+router.get("/", authorizeRoles("doctor", "assistant", "patient"), getAppointments);
 router.get("/:id", authorizeRoles("doctor", "assistant"), getAppointmentById);
 router.put("/:id/status", authorizeRoles("doctor", "assistant", "patient"), updateAppointmentStatus);
 

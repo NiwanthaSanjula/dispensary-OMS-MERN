@@ -1,4 +1,5 @@
 import { Appointment } from "../models/Appointment.model";
+import { Patient } from "../models/Patient.model";
 import { ApiError } from "../utils/ApiError";
 
 export interface AppointmentFilters {
@@ -15,7 +16,7 @@ const appointmentService = {
      * patientId -> filter by patient (used for patient portal)
      */
 
-    getAll: async (filters: AppointmentFilters) => {
+    getAll: async (filters: AppointmentFilters, userId?: string, userRole?: string) => {
         const filter: Record<string, unknown> = {};
 
         if (filters.patientId) filter.patientId = filters.patientId;
@@ -29,7 +30,17 @@ const appointmentService = {
             filter.date = { $gte: startOfDay, $lte: endOfDay };
         }
 
-        return await Appointment.find(filter).populate("patientId", "name phone email").sort({ date: 1, tokenNumber: 1 });
+        /**
+         * If caller is a patient - automatically scope to their own appointments
+         * Patient's userId -> find their Patient record -> filter by patientId
+         */
+        if (userRole === "patient" && userId) {
+            const patient = await Patient.findOne({ userId });
+            if (!patient) return [];
+            filter.patientId = patient._id;
+        }
+
+        return await Appointment.find(filter).populate("patientId", "name phone email").sort({ date: -1, tokenNumber: 1 });
 
     },
 

@@ -96,6 +96,14 @@ export const getAvailableDates = async (): Promise<{
     const settings = await Settings.findOne();
     if (!settings) throw new ApiError(500, "Settings not configured");
 
+    const localDateStr = (d: Date): string => {
+        return [
+            d.getFullYear(),
+            String(d.getMonth() + 1).padStart(2, "0"),
+            String(d.getDate()).padStart(2, "0"),
+        ].join("-");
+    };
+
     const dates = []
     const today = new Date();
     today.setHours(0, 0, 0, 0)
@@ -115,7 +123,7 @@ export const getAvailableDates = async (): Promise<{
         });
 
         dates.push({
-            date: date.toISOString().split("T")[0],     // "YYYY-MM-DD"
+            date: localDateStr(date),
             availableSlots: Math.max(0, settings.maxDailyLimit - bookedCount),
             totalSlots: settings.maxDailyLimit
         });

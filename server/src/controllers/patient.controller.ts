@@ -20,6 +20,11 @@ export const getPatients = asyncHandler(async (req: Request, res: Response) => {
     res.status(200).json(new ApiResponse("Patients fetched successfully", patients));
 });
 
+export const getMyProfile = asyncHandler(async (req: Request, res: Response) => {
+    const patient = await patientService.getMyProfile(req.user!._id);
+    res.status(200).json(new ApiResponse("Profile fetched", patient));
+});
+
 export const createPatient = asyncHandler(async (req: Request, res: Response) => {
     const patient = await patientService.create(req.body);
     res.status(200).json(new ApiResponse("Patient fetched successfully", patient));

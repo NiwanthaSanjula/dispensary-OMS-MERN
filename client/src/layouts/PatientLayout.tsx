@@ -2,8 +2,6 @@ import type { ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { sidebarConfig } from "../config/navigation";
-import authService from "../api/services/auth.service";
-import { FiLogOut } from "react-icons/fi";
 
 interface PatientLayoutProps {
     children: ReactNode
@@ -22,54 +20,32 @@ interface PatientLayoutProps {
 const PatientLayout = ({ children }: PatientLayoutProps) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
 
     if (!user) return null;
 
     const navItems = sidebarConfig["patient"];
 
-    const handleLogout = async () => {
-        try {
-            await authService.logout
-
-        } catch (error) {
-            // clear frontend state regardless
-        } finally {
-            logout();
-            navigate("/auth/login", { replace: true });
-        }
-    }
-
-
     return (
-        <div>
+        <div className="px-6 py-4">
 
             {/* --- TOP NAVBAR --- */}
-            <header>
+            <header className="flex items-center justify-between border-b border-gray-border pb-4 mb-4">
 
                 <div>
-                    <h1>
-                        <span>Medical Center</span>
+                    <h1 className="font-BabesNeue text-xl text-primary flex items-center gap-1">
+                        Medical
+                        <span className="text-dark">Center</span>
                     </h1>
                 </div>
 
-                <div>
-                    <div>
-                        <div>
-                            {user.name.charAt(0).toUpperCase()}
-                        </div>
-
-                        <span>
-                            {user.name}
-                        </span>
+                <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium">
+                        {user.name}
+                    </span>
+                    <div className="w-6 h-6 text-xs rounded-full bg-primary flex items-center justify-center text-white font-semibold">
+                        {user.name.charAt(0).toUpperCase()}
                     </div>
-
-                    <button
-                        onClick={handleLogout}
-                    >
-                        <FiLogOut size={20} />
-                        Logout
-                    </button>
                 </div>
             </header>
 
@@ -81,7 +57,7 @@ const PatientLayout = ({ children }: PatientLayoutProps) => {
             </main>
 
             {/* --- Bottom Navigation --- */}
-            <nav className="fixed bottom-0 left-0 right-0 bg-warning border-t border-gray-border 
+            <nav className="fixed bottom-0 left-0 right-0 bg-gray-bg border-t border-gray-border shadow-lg 
                             flex items-center justify-around px-2 py-2 z-10 "
             >
                 {navItems.map((item) => {
@@ -92,17 +68,17 @@ const PatientLayout = ({ children }: PatientLayoutProps) => {
                         <button
                             key={item.path}
                             onClick={() => navigate(item.path)}
-                            className={`
-                                ${isActive ? "text-primary" : "text-gray-text hover:text-primary"}
+                            className={`flex flex-col items-center gap-1
+                                ${isActive ? "text-primary font-semibold" : "text-gray-text hover:text-primary"}
                             `}
                         >
                             <Icon size={20} />
-                            <span>
+                            <span className="text-xs">
                                 {item.label}
                             </span>
                         </button>
                     );
-                })};
+                })}
 
             </nav>
         </div>

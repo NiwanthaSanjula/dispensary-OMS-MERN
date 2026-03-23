@@ -15,7 +15,7 @@ export interface IConsultation extends Document {
     symptoms?: string;
     diagnosis?: string;
     notes?: string;
-    followUpdate?: Date;
+    followUpDate?: Date;
     aiSummaryUsed: boolean;
     createdAt: Date;
     updatedAt: Date;
@@ -48,7 +48,7 @@ const ConsultationSchema = new Schema<IConsultation>(
             type: String,
             trim: true
         },
-        followUpdate: {
+        followUpDate: {
             type: Date,
             //  Optional - set if doctor wants patient to return on a specific date
         },

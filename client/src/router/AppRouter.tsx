@@ -39,6 +39,7 @@ import BookAppointment from "../pages/patient/BookAppointment";
 import MyAppointments from "../pages/patient/MyAppointments";
 import MyPrescriptions from "../pages/patient/MyPrescriptions";
 import SymptomCheck from "../pages/patient/SymptomCheck";
+import MyProfile from "../pages/patient/MyProfile";
 
 
 
@@ -233,6 +234,12 @@ const AppRouter = () => {
                 <Route path="/patient/symptom-check" element={
                     <PatientRoute>
                         <SymptomCheck />
+                    </PatientRoute>
+                } />
+
+                <Route path="/patient/profile" element={
+                    <PatientRoute>
+                        <MyProfile />
                     </PatientRoute>
                 } />
 
