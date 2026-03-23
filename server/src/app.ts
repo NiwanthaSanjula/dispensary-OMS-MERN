@@ -7,8 +7,10 @@ import morgan from "morgan";
 import { errorHandler } from "./middleware/error.middleware";
 import authRoutes from "./routes/auth.routes";
 import queueRoutes from "./routes/queue.routes";
-import patientRoutes from './routes/patient.routes'
-import appointmentRoutes from './routes/appointment.routes'
+import patientRoutes from './routes/patient.routes';
+import appointmentRoutes from './routes/appointment.routes';
+import consultationRoutes from "./routes/consultation.routes";
+import prescriptionRoutes from "./routes/prescription.routes"
 
 
 
@@ -57,10 +59,12 @@ const createApp = (): Application => {
     });
 
     //  API Routes-----------------------------------------------------------------------------
-    app.use("/api/auth/", authRoutes)
-    app.use("/api/queue/", queueRoutes)
-    app.use("/api/patients", patientRoutes)
-    app.use("/api/appointments", appointmentRoutes)
+    app.use("/api/auth/", authRoutes);
+    app.use("/api/queue/", queueRoutes);
+    app.use("/api/patients", patientRoutes);
+    app.use("/api/appointments", appointmentRoutes);
+    app.use("/api/consultations", consultationRoutes);
+    app.use("/api/prescriptions", prescriptionRoutes);
 
 
 
