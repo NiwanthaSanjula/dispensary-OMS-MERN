@@ -11,6 +11,7 @@ import { TbPlayerTrackNextFilled } from "react-icons/tb";
 import { FaArrowRight, FaPause } from "react-icons/fa";
 import { TbTriangleFilled } from "react-icons/tb";
 import { MdDoorSliding } from "react-icons/md";
+import LowStockBanner from '../../components/LowStockBanner';
 
 /**
  * Doctor Dashboard
@@ -166,6 +167,10 @@ const Dashboard = () => {
                             queue ? "Queue Closed" : "Queue not Initialized"}
 
                 </div>
+            </div>
+
+            <div className="my-4">
+                <LowStockBanner />
             </div>
 
             {/* --- ERROR BANNER */}
@@ -375,6 +380,8 @@ const Dashboard = () => {
                     </div>
                 )}
             </div>
+
+
         </div>
     )
 }

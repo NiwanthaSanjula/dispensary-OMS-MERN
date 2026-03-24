@@ -12,6 +12,7 @@ import { FaCheckCircle } from "react-icons/fa";
 import { FaArrowRight } from "react-icons/fa";
 import { FaArrowLeft } from "react-icons/fa"
 import { getTodayLocal } from '../../config/dateHelpers';
+import LowStockBanner from '../../components/LowStockBanner';
 
 /**
  * Assistant Dashboard
@@ -253,6 +254,11 @@ const Dashboard = () => {
                 </div>
             </div>
 
+
+            <div className="my-2">
+                <LowStockBanner />
+            </div>
+
             {/* Error banner */}
             {(error || initError) && (
                 <div className='bg-danger-light text-danger text-sm px-4 py-3 rounded-lg mb-5' >
@@ -404,7 +410,11 @@ const Dashboard = () => {
                 )}
             </div>
 
+
+            {/* _________________________________________________________________________________________________ */}
             {/* Book Appointment model */}
+            {/* _________________________________________________________________________________________________ */}
+
             {showBookModal && (
                 <div className='fixed inset-0 bg-black/50 flex items-center
                         justify-center z-50 px-4'>
