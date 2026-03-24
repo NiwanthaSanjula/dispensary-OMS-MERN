@@ -12,6 +12,7 @@ import appointmentRoutes from './routes/appointment.routes';
 import consultationRoutes from "./routes/consultation.routes";
 import prescriptionRoutes from "./routes/prescription.routes"
 import medicineRoutes from "./routes/medicine.routes"
+import aiRoutes from "./routes/ai.routes";
 
 
 
@@ -67,6 +68,7 @@ const createApp = (): Application => {
     app.use("/api/consultations", consultationRoutes);
     app.use("/api/prescriptions", prescriptionRoutes);
     app.use("/api/medicines", medicineRoutes);
+    app.use("/api/ai", aiRoutes);
 
 
 
