@@ -34,3 +34,22 @@ export const getPrescriptionsByPatient = asyncHandler(
         );
     }
 );
+
+export const getMePatientPrescriptions = asyncHandler(
+    async (req: Request, res: Response) => {
+        const { Patient } = await import("../models/Patient.model");
+        const patient = await Patient.findOne({ userId: req.user!._id });
+        if (!patient) {
+            res.status(200).json(
+                new ApiResponse("No prescriptions found", [])
+            );
+            return;
+        }
+        const prescriptions = await prescriptionService.getByPatient(
+            patient._id.toString()
+        );
+        res.status(200).json(
+            new ApiResponse("Prescriptions fetched", prescriptions)
+        );
+    }
+);
