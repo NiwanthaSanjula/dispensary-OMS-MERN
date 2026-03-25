@@ -9,7 +9,7 @@ export interface IPatient {
     dateOfBirth?: string;
     gender?: string
     allergies: string[];
-    booldGroup?: string;
+    bloodGroup?: string;
     address: string;
     createdAt: string
 }

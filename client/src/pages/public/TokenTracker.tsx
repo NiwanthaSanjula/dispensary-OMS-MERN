@@ -31,7 +31,7 @@ const TokenTracker = () => {
         if (!liveData || !trackedToken) return null;
 
         const trackedNumber = parseInt(trackedToken.replace("T-", ""));
-        const currentToken = liveData.curretToken;
+        const currentToken = liveData.currentToken;
 
         //  Count waiting tokens with lower number than ours
         const ahead = liveData.nextTokens.filter(

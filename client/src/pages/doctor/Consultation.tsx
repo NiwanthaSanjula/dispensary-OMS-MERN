@@ -10,6 +10,7 @@ import consultationService from "../../api/services/consultation.service";
 import prescriptionService from "../../api/services/prescription.service";
 import medicineService from "../../api/services/medicine.service";
 import { checkAllergyConflict } from "../../config/allergyCheck";
+import aiService, { type AISuggestion } from "../../api/services/ai.service";
 
 /**
  * Doctor Consultation Screen
@@ -29,7 +30,7 @@ const Consultation = () => {
     const { id: appointmentId } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
-    // ── Data state ──
+    // ___ Data state ___
     const [appointment, setAppointment] = useState<IAppointment | null>(null);
     const [patient, setPatient] = useState<IPatient | null>(null);
     const [consultation, setConsultation] = useState<IConsultation | null>(null);
@@ -38,7 +39,7 @@ const Consultation = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [pageError, setPageError] = useState("");
 
-    // ── Consultation form state ──
+    // ___ Consultation form state ___
     const [symptoms, setSymptoms] = useState("");
     const [diagnosis, setDiagnosis] = useState("");
     const [notes, setNotes] = useState("");
@@ -46,17 +47,27 @@ const Consultation = () => {
     //const [isSaving, setIsSaving] = useState(false);
     const [saveError, setSaveError] = useState("");
 
-    // ── Prescription builder state ──
+    // ___ Prescription builder state ___
     const [medicines, setMedicines] = useState<IPrescriptionMedicine[]>([]);
     const [instructions, setInstructions] = useState("");
     const [medicineSearch, setMedicineSearch] = useState("");
     const [showDropdown, setShowDropdown] = useState(false);
     const [isCompleting, setIsCompleting] = useState(false);
 
-    // ── Allergy warning state ──
+    // ___ Allergy warning state ___
     const [allergyConflicts, setAllergyConflicts] = useState<string[]>([]);
     const [showAllergyModal, setShowAllergyModal] = useState(false);
     const [allergyOverride, setAllergyOverride] = useState(false);
+
+    const [showAISummaryModal, setShowAISummaryModal] = useState(false);
+    const [aiSummary, setAISummary] = useState("");
+    const [isLoadingSummary, setIsLoadingSummary] = useState(false);
+    const [aiSummaryError, setAISummaryError] = useState("");
+
+    const [aiSuggestions, setAISuggestions] = useState<AISuggestion[]>([]);
+    const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+    const [aiSuggestError, setAISuggestError] = useState("");
+    const [showSuggestions, setShowSuggestions] = useState(false);
 
     // ─────────────────────────────────────────────────────────────────
     // Load all data on mount
@@ -171,6 +182,95 @@ const Consultation = () => {
                 m.medicineId === medicineId ? { ...m, [field]: value } : m
             )
         );
+    };
+
+    // ─────────────────────────────────────────────────────────────────
+    // AI Patient Briefing
+    // Fetches summary then shows modal
+    // Sets aiSummaryUsed = true on consultation via query param
+    // ─────────────────────────────────────────────────────────────────
+    const handleGetAISummary = async () => {
+        if (!patient || !consultation) return;
+        setIsLoadingSummary(true);
+        setAISummaryError("");
+        setShowAISummaryModal(true);
+
+        try {
+            const summary = await aiService.getPatientSummary(
+                patient._id,
+                consultation._id
+            );
+            setAISummary(summary);
+        } catch (err: unknown) {
+            const e = err as { response?: { data?: { message?: string } } };
+            setAISummaryError(
+                e.response?.data?.message || "Failed to generate AI summary"
+            );
+        } finally {
+            setIsLoadingSummary(false);
+        }
+    };
+
+
+    // ─────────────────────────────────────────────────────────────────
+    // AI Prescription Suggestions
+    // Sends diagnosis + allergies + available medicines to Gemini
+    // Returns suggested medicines doctor can add with one click
+    // ─────────────────────────────────────────────────────────────────
+    const handleGetAISuggestions = async () => {
+        if (!diagnosis.trim()) {
+            setAISuggestError("Please enter a diagnosis first");
+            setShowSuggestions(true);
+            return;
+        }
+
+        setIsLoadingSuggestions(true);
+        setAISuggestError("");
+        setShowSuggestions(true);
+
+        try {
+            const patientAllergies =
+                (patientData?.allergies as string[]) || [];
+
+            const suggestions = await aiService.getSuggestions({
+                diagnosis,
+                patientAllergies,
+                consultationId: consultation?._id,
+            });
+            setAISuggestions(suggestions);
+        } catch (err: unknown) {
+            const e = err as { response?: { data?: { message?: string } } };
+            setAISuggestError(
+                e.response?.data?.message || "Failed to get AI suggestions"
+            );
+        } finally {
+            setIsLoadingSuggestions(false);
+        }
+    };
+
+    // ─────────────────────────────────────────────────────────────────
+    // Add an AI-suggested medicine to prescription builder
+    // ─────────────────────────────────────────────────────────────────
+    const handleAddSuggestion = (suggestion: AISuggestion) => {
+        // Find the medicine in our loaded list to get the ID
+        const medicine = allMedicines.find(
+            (m) => m.name.toLowerCase() === suggestion.name.toLowerCase()
+        );
+        if (!medicine) return;
+
+        // Don't add if already in list
+        if (medicines.find((m) => m.medicineId === medicine._id)) return;
+
+        setMedicines((prev) => [
+            ...prev,
+            {
+                medicineId: medicine._id,
+                medicineName: medicine.name,
+                dosage: suggestion.dosage,
+                duration: suggestion.duration,
+                quantity: suggestion.quantity,
+            },
+        ]);
     };
 
     // ─────────────────────────────────────────────────────────────────
@@ -365,12 +465,16 @@ const Consultation = () => {
 
                 {/* AI Summary button — placeholder until Phase 8 */}
                 <button
-                    disabled
-                    className="btn-secondary w-full flex items-center justify-center
-                     gap-2 opacity-60 cursor-not-allowed"
-                    title="AI features coming in Phase 8"
+                    onClick={handleGetAISummary}
+                    disabled={isLoadingSummary}
+                    className="btn-secondary w-full flex items-center
+                               justify-center gap-2"
                 >
-                    ✦ AI Patient Briefing
+                    {isLoadingSummary ? (
+                        <><span className="animate-spin">⟳</span> Generating...</>
+                    ) : (
+                        <>✦ AI Patient Briefing</>
+                    )}
                 </button>
                 <p className="text-xs text-gray-text text-center -mt-2">
                     Available in Phase 8
@@ -475,12 +579,16 @@ const Consultation = () => {
 
                         {/* AI Suggest placeholder — Phase 8 */}
                         <button
-                            disabled
-                            className="btn-secondary text-xs py-1.5 px-3 opacity-60
-                         cursor-not-allowed flex items-center gap-1"
-                            title="AI features coming in Phase 8"
+                            onClick={handleGetAISuggestions}
+                            disabled={isLoadingSuggestions}
+                            className="btn-secondary text-xs py-1.5 px-3
+                                        flex items-center gap-1"
                         >
-                            ✦ AI Suggest
+                            {isLoadingSuggestions ? (
+                                <><span className="animate-spin text-xs">⟳</span> Loading...</>
+                            ) : (
+                                <>✦ AI Suggest</>
+                            )}
                         </button>
                     </div>
 
@@ -529,6 +637,117 @@ const Consultation = () => {
                             </div>
                         )}
                     </div>
+
+                    {/* AI Suggestions Panel */}
+                    {showSuggestions && (
+                        <div className="border border-accent/30 rounded-lg
+                  bg-accent-light p-3">
+                            <div className="flex items-center justify-between mb-2">
+                                <p className="text-accent text-xs font-semibold flex
+                    items-center gap-1">
+                                    ✦ AI Suggestions
+                                </p>
+                                <button
+                                    onClick={() => setShowSuggestions(false)}
+                                    className="text-gray-text text-xs hover:text-dark"
+                                >
+                                    ×
+                                </button>
+                            </div>
+
+                            {/* Loading */}
+                            {isLoadingSuggestions && (
+                                <p className="text-gray-text text-xs text-center py-3">
+                                    Gemini is thinking...
+                                </p>
+                            )}
+
+                            {/* Error */}
+                            {aiSuggestError && !isLoadingSuggestions && (
+                                <p className="text-danger text-xs">{aiSuggestError}</p>
+                            )}
+
+                            {/* Suggestions list */}
+                            {!isLoadingSuggestions && aiSuggestions.length > 0 && (
+                                <div className="space-y-2">
+                                    {aiSuggestions.map((suggestion, i) => {
+                                        const alreadyAdded = medicines.find(
+                                            (m) =>
+                                                m.medicineName.toLowerCase() ===
+                                                suggestion.name.toLowerCase()
+                                        );
+                                        const notInInventory = !allMedicines.find(
+                                            (m) =>
+                                                m.name.toLowerCase() ===
+                                                suggestion.name.toLowerCase()
+                                        );
+
+                                        return (
+                                            <div
+                                                key={i}
+                                                className={`bg-white rounded-lg p-2.5 border ${suggestion.warning
+                                                    ? "border-warning"
+                                                    : "border-gray-border"
+                                                    }`}
+                                            >
+                                                <div className="flex items-start justify-between gap-2">
+                                                    <div className="min-w-0">
+                                                        <p className="text-dark text-xs font-semibold">
+                                                            {suggestion.name}
+                                                        </p>
+                                                        <p className="text-gray-text text-xs mt-0.5">
+                                                            {suggestion.dosage} · {suggestion.duration} ·
+                                                            Qty: {suggestion.quantity}
+                                                        </p>
+                                                        {/* Allergy warning */}
+                                                        {suggestion.warning && (
+                                                            <p className="text-warning text-xs mt-1 flex
+                                                                            items-center gap-1">
+                                                                ⚠ {suggestion.warning}
+                                                            </p>
+                                                        )}
+                                                        {/* Not in inventory */}
+                                                        {notInInventory && (
+                                                            <p className="text-danger text-xs mt-1">
+                                                                ✕ Not in inventory
+                                                            </p>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Add button */}
+                                                    {!notInInventory && (
+                                                        <button
+                                                            onClick={() => handleAddSuggestion(suggestion)}
+                                                            disabled={!!alreadyAdded}
+                                                            className={`text-xs px-2.5 py-1 rounded-lg
+                                                                        shrink-0 font-medium
+                                                                        transition-colors ${alreadyAdded
+                                                                    ? "bg-gray-bg text-gray-text cursor-not-allowed"
+                                                                    : "bg-accent text-white hover:bg-blue-700"
+                                                                }`}
+                                                        >
+                                                            {alreadyAdded ? "Added ✓" : "+ Add"}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+
+                            {/* No suggestions */}
+                            {!isLoadingSuggestions &&
+                                !aiSuggestError &&
+                                aiSuggestions.length === 0 && (
+                                    <p className="text-gray-text text-xs text-center py-2">
+                                        No suggestions returned
+                                    </p>
+                                )}
+                        </div>
+                    )}
+
+
 
                     {/* Added medicines list */}
                     {medicines.length > 0 && (
@@ -709,6 +928,78 @@ const Consultation = () => {
                     )}
                 </div>
             </div>
+
+            {/* ── AI Summary Modal ── */}
+            {showAISummaryModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center
+                  justify-center z-50 px-4">
+                    <div className="bg-white rounded-xl shadow-xl w-full
+                    max-w-md p-6">
+
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="font-bold text-dark text-base flex
+                       items-center gap-2">
+                                ✦ AI Patient Briefing
+                            </h3>
+                            <button
+                                onClick={() => {
+                                    setShowAISummaryModal(false);
+                                    setAISummary("");
+                                    setAISummaryError("");
+                                }}
+                                className="text-gray-text hover:text-dark text-xl"
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        {/* Loading */}
+                        {isLoadingSummary && (
+                            <div className="text-center py-8">
+                                <div className="w-10 h-10 border-4 border-accent
+                          border-t-transparent rounded-full
+                          animate-spin mx-auto mb-3" />
+                                <p className="text-gray-text text-sm">
+                                    Gemini is reading patient history...
+                                </p>
+                            </div>
+                        )}
+
+                        {/* Error */}
+                        {aiSummaryError && !isLoadingSummary && (
+                            <div className="bg-danger-light text-danger text-sm
+                        px-4 py-3 rounded-lg">
+                                {aiSummaryError}
+                            </div>
+                        )}
+
+                        {/* Summary text */}
+                        {aiSummary && !isLoadingSummary && (
+                            <>
+                                <div className="bg-accent-light rounded-lg p-4">
+                                    <p className="text-dark text-sm leading-relaxed">
+                                        {aiSummary}
+                                    </p>
+                                </div>
+                                <p className="text-gray-text text-xs mt-3 text-center">
+                                    ✦ Generated by Gemini AI · Not a clinical decision tool
+                                </p>
+                            </>
+                        )}
+
+                        <button
+                            onClick={() => {
+                                setShowAISummaryModal(false);
+                                setAISummary("");
+                                setAISummaryError("");
+                            }}
+                            className="btn-outlined w-full mt-4"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* ── Allergy Warning Modal ──────────────────────────────────── */}
             {showAllergyModal && (

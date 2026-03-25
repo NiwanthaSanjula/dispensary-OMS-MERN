@@ -26,8 +26,6 @@ import Appointments from "../pages/shared/Appointments";
 // Doctor Pages___________________________________________________________________________________________
 import DoctorDashboard from "../pages/doctor/Dashboard";
 import Consultation from "../pages/doctor/Consultation";
-import PatientList from "../pages/doctor/PatientList";
-import PatientProfile from "../pages/doctor/PatientProfile";
 import DoctorSettings from "../pages/doctor/Settings";
 
 // Assistant Pages________________________________________________________________________________________
@@ -40,6 +38,7 @@ import MyAppointments from "../pages/patient/MyAppointments";
 import MyPrescriptions from "../pages/patient/MyPrescriptions";
 import SymptomCheck from "../pages/patient/SymptomCheck";
 import MyProfile from "../pages/patient/MyProfile";
+import PatientProfile from "../pages/shared/PatientProfile";
 
 
 
@@ -167,6 +166,12 @@ const AppRouter = () => {
                     </DashboardRoute>
                 } />
 
+                <Route path="/management/patients/:id" element={
+                    <DashboardRoute allowedRoles={["doctor", "assistant"]}>
+                        <PatientProfile />
+                    </DashboardRoute>
+                } />
+
 
                 {/** -------------------- Doctor Routes -------------------- **/}
                 <Route path="/doctor/dashboard" element={
@@ -177,18 +182,6 @@ const AppRouter = () => {
                 <Route path="/doctor/consultation/:id" element={
                     <DashboardRoute allowedRoles={["doctor"]}>
                         <Consultation />
-                    </DashboardRoute>
-                } />
-
-                <Route path="/doctor/patients" element={
-                    <DashboardRoute allowedRoles={["doctor"]}>
-                        <PatientList />
-                    </DashboardRoute>
-                } />
-
-                <Route path="/doctor/patients/:id" element={
-                    <DashboardRoute allowedRoles={["doctor"]}>
-                        <PatientProfile />
                     </DashboardRoute>
                 } />
 

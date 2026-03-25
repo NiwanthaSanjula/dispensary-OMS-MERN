@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext';
 import authService from '../../api/services/auth.service';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
@@ -7,7 +7,11 @@ import { FiEye, FiEyeOff } from 'react-icons/fi';
 const Register = () => {
 
     const navigate = useNavigate();
+    const location = useLocation();
     const { user, login } = useAuth();
+    
+    // Check if we were passed a returnTo route via state (e.g from GuestBooking)
+    const returnTo = location.state?.returnTo;
 
     const [formData, setFormData] = useState({
         name: "",
@@ -21,14 +25,17 @@ const Register = () => {
     const [error, setError] = useState<string>("");
     const [isLoading, setIsLoading] = useState(false);
 
-    // Already logged in - redirect to the home
     if (user) {
-        const map: Record<string, string> = {
-            doctor: "/doctor/dashboard",
-            assistant: "/assistant/dashboard",
-            patient: "/"
-        };
-        navigate(map[user.role], { replace: true });
+        if (returnTo) {
+            navigate(returnTo, { replace: true });
+        } else {
+            const map: Record<string, string> = {
+                doctor: "/doctor/dashboard",
+                assistant: "/assistant/dashboard",
+                patient: "/"
+            };
+            navigate(map[user.role], { replace: true });
+        }
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,7 +56,12 @@ const Register = () => {
         try {
             const result = await authService.register(formData);
             login(result);
-            navigate("/patient/dashboard", { replace: true })
+            
+            if (returnTo) {
+                navigate(returnTo, { replace: true });
+            } else {
+                navigate("/patient/dashboard", { replace: true });
+            }
 
         } catch (err: unknown) {
             const error = err as { response?: { data?: { message?: string } } };

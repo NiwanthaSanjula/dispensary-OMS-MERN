@@ -7,7 +7,7 @@ export interface CreatePatientPayload {
     email?: string;
     dateOfBirth?: string;
     gender?: string;
-    allergies?: string;
+    allergies?: string[];
     bloodGroup?: string;
     address?: string;
 }

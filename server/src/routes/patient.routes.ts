@@ -18,7 +18,7 @@ router.get("/", authorizeRoles("doctor", "assistant"), getPatients);
 router.get("/me", authorizeRoles("patient"), getMyProfile);
 router.post("/new-patient", authorizeRoles("assistant"), createPatient);
 router.get("/:id", authorizeRoles("doctor", "assistant"), getPatientById);
-router.put("/:id", authorizeRoles("assistant"), updatePatient);
+router.put("/:id", authorizeRoles("assistant", "patient"), updatePatient);
 router.get("/:id/history", authorizeRoles("doctor", "assistant"), getPatientHistory);
 
 export default router;

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { asyncHandler } from "../utils/asyncHandler";
 import patientService from "../services/patient.service";
 import { ApiResponse } from "../utils/ApiResponse";
+import { ApiError } from "../utils/ApiError";
 
 
 /**
@@ -36,6 +37,14 @@ export const getPatientById = asyncHandler(async (req: Request, res: Response) =
 });
 
 export const updatePatient = asyncHandler(async (req: Request, res: Response) => {
+    // Prevent a patient from editing another patient's profile
+    if (req.user?.role === "patient") {
+        const patientRecord = await patientService.getMyProfile(req.user._id);
+        if (patientRecord._id.toString() !== req.params.id) {
+            throw new ApiError(403, "You can only update your own profile");
+        }
+    }
+
     const patient = await patientService.update(req.params.id as string, req.body);
     res.status(200).json(new ApiResponse("Patient updated successfully", patient))
 });

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import authService from '../../api/services/auth.service';
@@ -7,21 +7,28 @@ import authService from '../../api/services/auth.service';
 const Login = () => {
 
     const navigate = useNavigate();
+    const location = useLocation();
     const { login, user } = useAuth();
+    
+    // Check if we were passed a returnTo route via state (e.g from GuestBooking)
+    const returnTo = location.state?.returnTo;
 
     const [formData, setFormData] = useState({ email: "", password: "" });
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState<string>("");
     const [isLoading, setIsLoading] = useState(false);
 
-    // Already logged in - redirect to the home
     if (user) {
-        const map: Record<string, string> = {
-            doctor: "/doctor/dashboard",
-            assistant: "/assistant/dashboard",
-            patient: "/"
-        };
-        navigate(map[user.role], { replace: true });
+        if (returnTo) {
+            navigate(returnTo, { replace: true });
+        } else {
+            const map: Record<string, string> = {
+                doctor: "/doctor/dashboard",
+                assistant: "/assistant/dashboard",
+                patient: "/"
+            };
+            navigate(map[user.role], { replace: true });
+        }
     }
 
     const handleSubmit = async (e: React.SubmitEvent) => {
@@ -33,12 +40,16 @@ const Login = () => {
             const result = await authService.login(formData);
             login(result);
 
-            const dashboardMap: Record<string, string> = {
-                doctor: "/doctor/dashboard",
-                assistant: "/assistant/dashboard",
-                patient: "/patient/dashboard"
-            };
-            navigate(dashboardMap[result.user.role], { replace: true });
+            if (returnTo) {
+                navigate(returnTo, { replace: true });
+            } else {
+                const dashboardMap: Record<string, string> = {
+                    doctor: "/doctor/dashboard",
+                    assistant: "/assistant/dashboard",
+                    patient: "/patient/dashboard"
+                };
+                navigate(dashboardMap[result.user.role], { replace: true });
+            }
 
 
         } catch (err: unknown) {
