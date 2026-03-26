@@ -91,3 +91,10 @@ AppointmentSchema.index({ patientId: 1, date: -1 });
 AppointmentSchema.index({ date: 1, tokenNumber: 1 }, { unique: true });
 
 export const Appointment = mongoose.model<IAppointment>("Appointment", AppointmentSchema);
+
+export type AppointmentStatus =
+    | "waiting"
+    | "serving"
+    | "completed"
+    | "noshow"
+    | "cancelled";

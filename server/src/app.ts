@@ -6,6 +6,16 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import { errorHandler } from "./middleware/error.middleware";
 import authRoutes from "./routes/auth.routes";
+import queueRoutes from "./routes/queue.routes";
+import patientRoutes from './routes/patient.routes';
+import appointmentRoutes from './routes/appointment.routes';
+import consultationRoutes from "./routes/consultation.routes";
+import prescriptionRoutes from "./routes/prescription.routes"
+import medicineRoutes from "./routes/medicine.routes"
+import aiRoutes from "./routes/ai.routes";
+import settingsRoutes from "./routes/settings.routes";
+
+
 
 /**
  * Express Application Factory
@@ -25,7 +35,8 @@ const createApp = (): Application => {
     app.use(cors({
         origin: ENV.CLIENT_URL,
         credentials: true,  //  Required for httpOnly cookie (refresh token)
-        methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
     }));
 
     // Parsing Middleware----------------------------------------------------------------------
@@ -51,7 +62,36 @@ const createApp = (): Application => {
     });
 
     //  API Routes-----------------------------------------------------------------------------
-    app.use("/api/auth/", authRoutes)
+    app.use("/api/auth/", authRoutes);
+    app.use("/api/queue/", queueRoutes);
+    app.use("/api/patients", patientRoutes);
+    app.use("/api/appointments", appointmentRoutes);
+    app.use("/api/consultations", consultationRoutes);
+    app.use("/api/prescriptions", prescriptionRoutes);
+    app.use("/api/medicines", medicineRoutes);
+    app.use("/api/ai", aiRoutes);
+    app.use("/api/settings", settingsRoutes);
+
+
+
+
+    /*app.get("/api/seed-settings", async (_req, res) => {
+        const { Settings } = await import("./models/Setting.model");
+        const existing = await Settings.findOne();
+        if (!existing) {
+            await Settings.create({
+                dispensaryName: "Demo Dispensary",
+                doctorName: "Dr.Unknown",
+                openningTime: "09:00",
+                closingTime: "17:00",
+                avgConsultationMinutes: 20,
+                maxDailyLimit: 40,
+                advanceBookingDays: 7,
+            });
+        }
+        res.json({ message: "Settings seeded" })
+    })*/
+
 
 
     //  404 Handler----------------------------------------------------------------------------
