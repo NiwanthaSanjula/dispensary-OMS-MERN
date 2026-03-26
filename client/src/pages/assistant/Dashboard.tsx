@@ -13,6 +13,7 @@ import { FaCheckCircle, FaUsers, FaArrowRight, FaArrowLeft } from "react-icons/f
 //import { getTodayLocal } from '../../config/dateHelpers';
 import LowStockBanner from '../../components/LowStockBanner';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 /**
  * Assistant Dashboard
@@ -193,7 +194,7 @@ const Dashboard = () => {
     return (
         <div>
             {/* Header */}
-            <div className='flex flex-col md:flex-row items-start md:items-center justify-between mb-6'>
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className='flex flex-col md:flex-row items-start md:items-center justify-between mb-6'>
                 <div>
                     <h1 className='page-title'>Welcome, {user?.name}</h1>
                     <p className='text-gray-text text-sm'>
@@ -207,7 +208,7 @@ const Dashboard = () => {
                     <div className={`w-2 h-2 rounded-full ${queue?.status === "open" ? "bg-primary animate-pulse" : queue?.status === "paused" ? "bg-warning" : "bg-gray-400"}`} />
                     {queue?.status === "open" ? "Queue Open" : queue?.status === "paused" ? "Queue Paused" : queue?.status === "closed" ? "Queue Closed" : "Queue Not Initialized"}
                 </div>
-            </div>
+            </motion.div>
 
             <div className="my-2">
                 <LowStockBanner />
@@ -221,7 +222,7 @@ const Dashboard = () => {
             )}
 
             {/* Stats bar */}
-            <div className='grid grid-cols-1 md:grid-cols-4 gap-4 mb-6'>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }} className='grid grid-cols-1 md:grid-cols-4 gap-4 mb-6'>
                 {[
                     { label: "Total Today", value: appointments.length, color: "accent", },
                     { label: "Completed", value: completedCount, color: "primary" },
@@ -236,10 +237,10 @@ const Dashboard = () => {
                         </div>
                     )
                 })}
-            </div>
+            </motion.div>
 
             {/* Main Content Layout - 2 Columns */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+            <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 0.2 }} className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
 
                 {/* Column 1: Today's Queue Table */}
                 <div className="xl:col-span-2 flex flex-col gap-6">
@@ -377,12 +378,12 @@ const Dashboard = () => {
                         )}
                     </div>
                 </div>
-            </div>
+            </motion.div>
 
             {/* Book Appointment Modal (Unchanged) */}
             {showBookModal && (
                 <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4'>
-                    <div className='bg-white rounded-4xl shadow-2xl w-full max-w-md p-6 lg:p-8 transform transition-all'>
+                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className='bg-white rounded-4xl shadow-2xl w-full max-w-md p-6 lg:p-8 transform transition-all'>
                         <div className="flex items-center justify-between mb-6">
                             <h3 className='text-xl font-bold text-dark'>Book Walk-in</h3>
                             <button onClick={handleCloseModel} className='text-gray-400 hover:text-dark transition bg-gray-50 rounded-full w-8 h-8 flex items-center justify-center'>x</button>
@@ -464,7 +465,7 @@ const Dashboard = () => {
                                 )}
                             </>
                         )}
-                    </div>
+                    </motion.div>
                 </div>
             )}
         </div>

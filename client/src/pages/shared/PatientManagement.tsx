@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import patientService from "../../api/services/patient.service";
 import type { IPatient } from "../../types/patient.types";
 import useDebounce from "../../hooks/useDebounce";
+import { motion } from "framer-motion";
 
 /**
  * Doctor Patient List
@@ -42,20 +43,26 @@ const PatientManagement = () => {
     }, [debouncedSearch]);
 
     return (
-        <div>
+        <div className="max-w-7xl mx-auto">
 
             {/* ── Page Header ── */}
-            <div className="flex items-center justify-between mb-6">
+            <motion.div 
+                initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
+                className="flex items-center justify-between mb-6"
+            >
                 <div>
                     <h1 className="page-title">Patients</h1>
                     <p className="text-gray-text text-sm">
                         {!isLoading && `${patients.length} patients found`}
                     </p>
                 </div>
-            </div>
+            </motion.div>
 
             {/* ── Search ── */}
-            <div className="mb-5">
+            <motion.div 
+                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
+                className="mb-5"
+            >
                 <input
                     type="text"
                     className="input-field max-w-md"
@@ -63,7 +70,7 @@ const PatientManagement = () => {
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
-            </div>
+            </motion.div>
 
             {/* ── Error ── */}
             {error && (
@@ -74,7 +81,10 @@ const PatientManagement = () => {
             )}
 
             {/* ── Patient Table ── */}
-            <div className="card">
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 0.2 }}
+                className="card"
+            >
                 {isLoading ? (
                     <div className="text-center py-12 text-gray-text">
                         Loading patients...
@@ -148,9 +158,9 @@ const PatientManagement = () => {
 
                                         {/* Blood group */}
                                         <td className="py-3 pr-4">
-                                            {patient.booldGroup ? (
+                                            {patient.bloodGroup ? (
                                                 <span className="font-bold text-dark">
-                                                    {patient.booldGroup}
+                                                    {patient.bloodGroup}
                                                 </span>
                                             ) : (
                                                 <span className="text-gray-text">—</span>
@@ -198,7 +208,7 @@ const PatientManagement = () => {
                         </table>
                     </div>
                 )}
-            </div>
+            </motion.div>
         </div>
     );
 };

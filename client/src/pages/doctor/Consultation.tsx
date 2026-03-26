@@ -375,10 +375,10 @@ const Consultation = () => {
     // Render
     // ─────────────────────────────────────────────────────────────────
     return (
-        <div className="flex gap-4 h-full min-h-0">
+        <div className="flex flex-col lg:flex-row gap-4 h-full min-h-0 overflow-y-auto lg:overflow-hidden pb-20 lg:pb-0">
 
             {/* ── LEFT PANEL — Patient Profile ──────────────────────────── */}
-            <div className="w-64 shrink-0 flex flex-col gap-4">
+            <div className="w-full lg:w-64 shrink-0 flex flex-col gap-4">
 
                 {/* Back button */}
                 <button
@@ -424,11 +424,11 @@ const Consultation = () => {
                                 </span>
                             </div>
                         )}
-                        {patientData?.booldGroup && (
+                        {patientData?.bloodGroup && (
                             <div className="flex justify-between">
                                 <span className="text-gray-text text-xs">Blood Group</span>
                                 <span className="text-dark text-xs font-bold">
-                                    {patientData.booldGroup}
+                                    {patientData.bloodGroup}
                                 </span>
                             </div>
                         )}
@@ -482,7 +482,7 @@ const Consultation = () => {
             </div>
 
             {/* ── CENTER PANEL — Consultation Form ──────────────────────── */}
-            <div className="flex-1 min-w-0 flex flex-col gap-4 overflow-y-auto">
+            <div className="flex-1 min-w-0 flex flex-col gap-4 lg:overflow-y-auto">
 
                 {/* Panel header */}
                 <div className="card py-3">
@@ -769,7 +769,7 @@ const Consultation = () => {
                                         </button>
                                     </div>
 
-                                    <div className="grid grid-cols-3 gap-2">
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                         <div>
                                             <label className="input-label text-xs">Dosage</label>
                                             <input
@@ -858,8 +858,8 @@ const Consultation = () => {
             </div>
 
             {/* ── RIGHT PANEL — Visit History ────────────────────────────── */}
-            <div className="w-64 shrink-0">
-                <div className="card h-full overflow-y-auto">
+            <div className="w-full lg:w-64 shrink-0 mt-4 lg:mt-0">
+                <div className="card lg:h-full max-h-[400px] lg:max-h-none overflow-y-auto">
                     <h3 className="section-title">
                         Visit History
                         <span className="text-gray-text font-normal ml-1 text-xs">

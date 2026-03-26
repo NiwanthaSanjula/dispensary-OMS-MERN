@@ -17,6 +17,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { CreateMedicinePayload } from "../../api/services/medicine.service";
 import type { IMedicine, IStockLog } from "../../types/medicine.types";
 import medicineService from "../../api/services/medicine.service";
+import { motion } from "framer-motion";
 
 // Stock status helper_________________________________________________________________________
 type StockLevel = "sufficient" | "low" | "critical";
@@ -247,10 +248,10 @@ const Inventory = () => {
 
 
     return (
-        <div>
+        <div className="max-w-7xl mx-auto ">
 
             {/* ____Page Header____ */}
-            <div className="flex items-center justify-between mb-6">
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="flex items-center justify-between mb-6">
                 <div>
                     <h1 className="page-title">Inventory</h1>
                     <p className="text-gray-text text-sm">
@@ -262,7 +263,7 @@ const Inventory = () => {
                 <button onClick={openAddModal} className="btn-primary">
                     + Add Medicine
                 </button>
-            </div>
+            </motion.div>
 
             {error && (
                 <div className="bg-danger-light text-danger text-sm px-4 py-3
@@ -272,7 +273,7 @@ const Inventory = () => {
             )}
 
             {/* ___ Tabs ___ */}
-            <div className="flex gap-1 mb-5 border-b border-gray-border">
+            <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.1 }} className="flex gap-1 mb-5 border-b border-gray-border">
                 {(["medicines", "history"] as const).map((tab) => (
                     <button
                         key={tab}
@@ -286,7 +287,7 @@ const Inventory = () => {
                         {tab === "medicines" ? "Medicines" : "Stock History"}
                     </button>
                 ))}
-            </div>
+            </motion.div>
 
             {/*_____________________________________________________________________________________ */}
             {/* TAB 1 - MEDICINES*/}
@@ -295,7 +296,7 @@ const Inventory = () => {
             {activeTab === "medicines" && (
                 <>
                     {/* Filter row */}
-                    <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }} className="flex flex-col sm:flex-row gap-3 mb-4">
                         <input
                             type="text"
                             className="input-field flex-1"
@@ -324,10 +325,10 @@ const Inventory = () => {
                             <option value="low">Low Stock</option>
                             <option value="critical">Critical</option>
                         </select>
-                    </div>
+                    </motion.div>
 
                     {/* Medicines table */}
-                    <div className="card">
+                    <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 0.2 }} className="card">
                         {isLoading ? (
                             <div className="text-center py-12 text-gray-text">
                                 Loading medicines...
@@ -448,7 +449,7 @@ const Inventory = () => {
                                 </table>
                             </div>
                         )}
-                    </div>
+                    </motion.div>
                 </>
             )}
 
@@ -456,7 +457,7 @@ const Inventory = () => {
             {/* TAB  - STOCK HISTORY  */}
             {/*_____________________________________________________________________________________ */}
             {activeTab === "history" && (
-                <div className="card">
+                <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 0.2 }} className="card">
                     {stockLogs.length === 0 ? (
                         <div className="text-center py-12 text-gray-text">
                             <p className="text-3xl mb-3">📋</p>
@@ -548,7 +549,7 @@ const Inventory = () => {
                             </table>
                         </div>
                     )}
-                </div>
+                </motion.div>
             )}
 
             {/*_____________________________________________________________________________________1 */}
@@ -557,7 +558,7 @@ const Inventory = () => {
             {showMedicineModal && (
                 <div className="fixed inset-0 bg-black/50 flex items-center
                         justify-center z-50 px-4">
-                    <div className="bg-white rounded-xl shadow-xl w-full
+                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-xl shadow-xl w-full
                           max-w-md p-6 max-h-[90vh] overflow-y-auto">
 
                         <div className="flex items-center justify-between mb-5">
@@ -737,7 +738,7 @@ const Inventory = () => {
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
             )}
 
@@ -747,7 +748,7 @@ const Inventory = () => {
             {showStockModal && stockTarget && (
                 <div className="fixed inset-0 bg-black/50 flex items-center
                         justify-center z-50 px-4">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-6">
+                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-xl shadow-xl w-full max-w-sm p-6">
 
                         <div className="flex items-center justify-between mb-5">
                             <h3 className="font-bold text-dark text-base">Add Stock</h3>
@@ -820,7 +821,7 @@ const Inventory = () => {
                                 {isAddingStock ? "Adding..." : "Add Stock"}
                             </button>
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
             )}
 

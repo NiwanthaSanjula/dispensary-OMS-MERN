@@ -4,6 +4,8 @@ import { useAuth } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar';
 import { FaUserMd, FaCalendarCheck, FaPills, FaChartLine, FaArrowRight, FaShieldAlt, FaRegClock, FaUsers } from 'react-icons/fa';
 import assets from '../../assets/assets';
+import FAQ from '../../components/FAQ';
+import Contact from '../../components/Contact';
 
 const Landing = () => {
     const { user } = useAuth();
@@ -436,7 +438,7 @@ const Landing = () => {
                                 viewport={{ once: true }}
                                 transition={{ delay: index * 0.1 }}
                                 whileHover={{ y: -10 }}
-                                className="p-10 rounded-[2.5rem] bg-[#fafcff] border border-slate-100 hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 group"
+                                className="p-10 rounded-[2.5rem] bg-[#fafcff] border border-slate-100 hover:border-primary/20 border-t-4 border-t-primary shadow-lg hover:shadow-xl transition-all duration-500 group"
                             >
                                 <div className="flex justify-between items-start mb-8">
                                     <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-primary text-2xl group-hover:bg-primary group-hover:text-white transition-all duration-500">
@@ -456,66 +458,30 @@ const Landing = () => {
                 </div>
             </section>
 
-            
+            <FAQ />
 
-            {/* --- PREMIUM CTA SECTION --- */}
-            <section className="py-32 relative overflow-hidden bg-dark">
-                {/* Background Image heavily tinted */}
-                <div className="absolute inset-0 overflow-hidden">
-                    <img
-                        src="https://images.unsplash.com/photo-1516549655169-df83a0774514?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
-                        alt="Clinic Background"
-                        className="w-full h-full object-cover opacity-[0.15] scale-105"
-                    />
-                    <div className="absolute inset-0 bg-linear-to-r from-dark via-dark/95 to-primary-dark/80"></div>
-                </div>
-
-                <div className="container mx-auto px-6 relative z-10 max-w-5xl">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8 }}
-                        className="text-center relative overflow-hidden"
-                    >
-                        <h2 className="text-4xl md:text-6xl font-black text-white mb-6 relative z-10 tracking-tight">
-                            Ready to transform your clinic?
-                        </h2>
-                        <p className="text-slate-300 text-xl font-medium mb-12 max-w-2xl mx-auto relative z-10">
-                            Join the next generation of healthcare professionals providing faster, seamless experiences for their patients.
-                        </p>
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
-                            <Link to="/auth/login" className="relative z-10 w-full sm:w-auto inline-flex justify-center px-10 py-5 bg-white text-dark hover:bg-slate-50 font-black text-xl rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] transform hover:-translate-y-1 transition-all items-center gap-3">
-                                Get Started Now <FaArrowRight />
-                            </Link>
-                            <Link to="/track" className="relative z-10 w-full sm:w-auto inline-flex justify-center px-10 py-5 border-2 border-white/30 text-white hover:bg-white/10 font-bold text-xl rounded-2xl transition-all items-center gap-3 backdrop-blur-sm">
-                                Track My Token
-                            </Link>
-                        </div>
-                    </motion.div>
-                </div>
-            </section>
+            <Contact />
 
             {/* --- MINIMAL FOOTER --- */}
-            <footer className="bg-white border-t border-gray-100 pt-20 pb-10">
+            <footer className="bg-dark border-t border-gray-100 pt-20 pb-10">
                 <div className="container mx-auto px-6 max-w-7xl">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-8 mb-16">
                         <Link to="/" className="flex items-center gap-2 group">
                             <div className="bg-primary text-white p-2 rounded-xl group-hover:scale-110 shadow-lg shadow-primary/30 transition-all">
                                 <FaUserMd size={20} />
                             </div>
-                            <span className="font-extrabold text-2xl text-dark tracking-tight">
-                                CureSync
+                            <span className="font-extrabold text-2xl text-white tracking-tight">
+                                Medicle<span className='text-primary'>Center</span>
                             </span>
                         </Link>
 
                         <div className="flex gap-8 text-sm font-bold text-slate-500 uppercase tracking-widest flex-wrap justify-center">
                             <button onClick={() => window.scrollTo(0, 0)} className="hover:text-primary cursor-pointer transition-colors">Home</button>
                             <Link to="/auth/login" className="hover:text-primary cursor-pointer transition-colors">Login</Link>
-                            <Link to="/book" className="hover:text-primary cursor-pointer transition-colors">Book Appt</Link>
+                            <Link to="/book" className="hover:text-primary cursor-pointer transition-colors">Book Appointment</Link>
                             <Link to="/track" className="hover:text-primary cursor-pointer transition-colors">Track Token</Link>
                             <Link to="/live-board" className="hover:text-primary cursor-pointer transition-colors flex items-center gap-1.5">
-                                <span className="w-1.5 h-1.5 bg-danger rounded-full animate-pulse"></span>Live Queue
+                                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>Live Queue
                             </Link>
                         </div>
                     </div>

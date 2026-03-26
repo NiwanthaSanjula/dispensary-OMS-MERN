@@ -5,6 +5,7 @@ import { useState } from 'react';
 import queueService from '../../api/services/queue.service';
 import type { IAppointment, AppointmentStatus } from '../../types/appointment.types'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { motion } from 'framer-motion';
 
 import { GiPlayerNext } from "react-icons/gi";
 import { TbPlayerTrackNextFilled, TbTriangleFilled } from "react-icons/tb";
@@ -106,7 +107,7 @@ const Dashboard = () => {
 
     // Mock chart data for weekly visual based on current queue logic
     // In a real app with more routes, this would fetch from /api/stats. Here we visualize current state effectively.
-    const activeAppointments = appointments.filter(a => a.status === 'completed' || a.status === 'waiting' || a.status === 'serving');
+    //const activeAppointments = appointments.filter(a => a.status === 'completed' || a.status === 'waiting' || a.status === 'serving');
     const chartData = [
         { name: 'Waiting', patients: waitingCount, fill: '#f59e0b' },
         { name: 'Treated', patients: completedCount, fill: '#10b981' },
@@ -116,17 +117,17 @@ const Dashboard = () => {
     const recentlyTreated = appointments.filter(a => a.status === 'completed').reverse().slice(0, 5);
 
     return (
-        <div>
+        <div className='max-w-7xl mx-auto'>
             {/* Header */}
             <div className='flex flex-col md:flex-row items-start md:items-center justify-between mb-6'>
                 <div>
-                    <h1 className='page-title'>Good morning, Dr. {user?.name?.split(" ")[user.name.split(" ").length - 1] || user?.name}</h1>
+                    <h1 className='page-title'>Good morning,<span className='text-primary'> Dr. {user?.name?.split(" ")[user.name.split(" ").length - 1] || user?.name}</span></h1>
                     <p className='text-gray-text text-sm font-medium'>
                         {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                     </p>
                 </div>
-                <div className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm ${queue?.status === "open" ? "bg-success/10 text-success-dark border border-success/20" : queue?.status === "paused" ? "bg-warning/10 text-warning-dark border border-warning/20" : "bg-gray-100 text-gray-500 border border-gray-200"}`}>
-                    <div className={`w-2.5 h-2.5 rounded-full ${queue?.status === "open" ? "bg-success animate-pulse" : queue?.status === "paused" ? "bg-warning" : "bg-gray-400"}`} />
+                <div className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm ${queue?.status === "open" ? "bg-primary-light text-primary-dark" : queue?.status === "paused" ? "bg-warning/10 text-warning-dark border border-warning/20" : "bg-gray-100 text-gray-500 border border-gray-200"}`}>
+                    <div className={`w-2.5 h-2.5 rounded-full ${queue?.status === "open" ? "bg-primary animate-pulse" : queue?.status === "paused" ? "bg-warning" : "bg-gray-400"}`} />
                     {queue?.status === "open" ? "Queue Open" : queue?.status === "paused" ? "Queue Paused" : queue ? "Queue Closed" : "Queue not Initialized"}
                 </div>
             </div>
@@ -140,7 +141,10 @@ const Dashboard = () => {
             )}
 
             {/* Stats bar */}
-            <div className='grid grid-cols-1 md:grid-cols-4 gap-4 mb-6'>
+            <motion.div
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
+                className='grid grid-cols-1 md:grid-cols-4 gap-4 mb-6'
+            >
                 {[
                     { label: "Total Booked", value: appointments.length, color: "accent", },
                     { label: "Patients Treated", value: completedCount, color: "primary" },
@@ -155,11 +159,14 @@ const Dashboard = () => {
                         </div>
                     )
                 })}
-            </div>
+            </motion.div>
 
             {/* Queue Controllers */}
             {queue && queue.status !== 'closed' && (
-                <div className='flex items-center gap-3 mb-6 bg-white p-3 rounded-xl border border-gray-100 shadow-sm'>
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.1 }}
+                    className='flex items-center gap-3 mb-6 bg-white p-3 rounded-xl border border-gray-100 shadow-sm'
+                >
                     <div className="text-sm font-bold text-gray-400 uppercase tracking-widest px-2">Controls:</div>
                     {queue.status === "open" ? (
                         <button onClick={handlePause} disabled={isActioning} className='btn-secondary flex items-center gap-2 text-sm bg-gray-100 text-dark hover:bg-gray-200'>
@@ -173,12 +180,15 @@ const Dashboard = () => {
                     <button onClick={handleClose} disabled={isActioning} className='btn-outlined text-danger border-danger/30 hover:bg-danger hover:text-white flex items-center gap-2 text-sm ml-auto'>
                         <MdDoorSliding size={18} /> Close Clinic Day
                     </button>
-                </div>
+                </motion.div>
             )}
 
             {/* Main 2-Column Dashboard Layout */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
-                
+            <motion.div
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
+                className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8"
+            >
+
                 {/* 📌 Left Column: Live Queue (Spans 2 cols on lg) */}
                 <div className="xl:col-span-2 flex flex-col gap-6">
                     <div className='card flex-1 p-0 overflow-hidden'>
@@ -219,7 +229,7 @@ const Dashboard = () => {
                                     <tbody className="divide-y divide-gray-50">
                                         {appointments.map((appt: IAppointment) => {
                                             const isServing = appt.status === "serving";
-                                            if(appt.status === 'completed' || appt.status === 'noshow') return null; // Only show active items in main table
+                                            if (appt.status === 'completed' || appt.status === 'noshow') return null; // Only show active items in main table
                                             const patient = appt.patientId as unknown as { name: string; phone: string };
 
                                             return (
@@ -273,11 +283,11 @@ const Dashboard = () => {
                     <div className="card">
                         <h3 className="text-sm font-bold uppercase tracking-wider text-dark mb-4">Daily Activity Segment</h3>
                         <div className="h-40 w-full mb-2">
-                             <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 30, left: 0, bottom: 0 }}>
                                     <XAxis type="number" hide />
-                                    <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12, fontWeight: 'bold'}} width={65} />
-                                    <Tooltip cursor={{fill: 'transparent'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
+                                    <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12, fontWeight: 'bold' }} width={65} />
+                                    <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
                                     <Bar dataKey="patients" radius={[0, 8, 8, 0]} barSize={24} />
                                 </BarChart>
                             </ResponsiveContainer>
@@ -290,7 +300,7 @@ const Dashboard = () => {
                             <h3 className="text-sm font-bold uppercase tracking-wider text-dark">Recently Treated</h3>
                             <span className="bg-success/10 text-success-dark text-xs font-bold px-2 py-1 rounded-md">{recentlyTreated.length} Today</span>
                         </div>
-                        
+
                         <div className="flex-1 flex flex-col gap-3">
                             {recentlyTreated.length > 0 ? (
                                 recentlyTreated.map((appt) => {
@@ -322,7 +332,7 @@ const Dashboard = () => {
                     </div>
 
                 </div>
-            </div>
+            </motion.div>
 
         </div>
     )

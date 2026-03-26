@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import appointmentService from "../../api/services/appointment.service";
 import queueService from "../../api/services/queue.service";
 import patientService from "../../api/services/patient.service";
@@ -7,6 +7,7 @@ import type { IPatient } from "../../types/patient.types";
 
 import { FaArrowRight, FaArrowLeft, FaCheckCircle, FaCalendarPlus } from "react-icons/fa";
 import { getTodayLocal } from "../../config/dateHelpers";
+import { motion } from "framer-motion";
 
 const Appointments = () => {
     // ─── STATE: Appointments List ─────────
@@ -49,7 +50,7 @@ const Appointments = () => {
             setAppointments(data);
         } catch (err: unknown) {
             const e = err as { response?: { data?: { message?: string } } };
-             setError(e.response?.data?.message || "Failed to load appointments");
+            setError(e.response?.data?.message || "Failed to load appointments");
         } finally {
             setIsLoading(false);
         }
@@ -136,7 +137,7 @@ const Appointments = () => {
                 tokenCode: appointment.tokenCode,
                 estimatedTime: appointment.estimatedTime
             });
-            
+
             // Refresh main table
             fetchAppointments();
 
@@ -178,9 +179,9 @@ const Appointments = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-7xl mx-auto">
             {/* ─── Header ─── */}
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <div>
                     <h1 className="page-title">Appointments</h1>
                     <p className="text-gray-text text-sm">Manage all appointments and walk-ins</p>
@@ -197,10 +198,10 @@ const Appointments = () => {
                         Book Appointment
                     </button>
                 </div>
-            </div>
+            </motion.div>
 
             {/* ─── Stats ─── */}
-            <div className="grid grid-cols-3 gap-4">
+            <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.1 }} className="grid grid-cols-3 gap-4">
                 <div className="card text-center py-4">
                     <div className="text-3xl font-bold text-dark">{total}</div>
                     <div className="text-xs text-gray-text mt-1 uppercase tracking-wide">Total</div>
@@ -213,10 +214,10 @@ const Appointments = () => {
                     <div className="text-3xl font-bold text-success">{completed}</div>
                     <div className="text-xs text-gray-text mt-1 uppercase tracking-wide">Completed</div>
                 </div>
-            </div>
+            </motion.div>
 
             {/* ─── Appointments List ─── */}
-            <div className="card">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }} className="card">
                 {isLoading ? (
                     <div className="text-center py-10 text-gray-text">Loading appointments...</div>
                 ) : error ? (
@@ -266,7 +267,7 @@ const Appointments = () => {
                                             </span>
                                         </td>
                                         <td className="py-3 px-4">
-                                            <select 
+                                            <select
                                                 className="input-field py-1 px-2 text-sm max-w-[130px]"
                                                 value={appt.status}
                                                 onChange={(e) => handleStatusUpdate(appt._id, e.target.value as AppointmentStatus)}
@@ -285,12 +286,12 @@ const Appointments = () => {
                         </table>
                     </div>
                 )}
-            </div>
+            </motion.div>
 
             {/* ─── BOOKING MODAL (Copied from Assistant Dashboard) ─── */}
             {showBookModal && (
                 <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4'>
-                    <div className='bg-white rounded-xl shadow-xl w-full max-w-md p-6'>
+                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className='bg-white rounded-xl shadow-xl w-full max-w-md p-6'>
                         {/* Modal Header */}
                         <div className="flex items-center justify-between mb-5">
                             <h3 className='text-base font-bold text-dark'>
@@ -497,7 +498,7 @@ const Appointments = () => {
                                 )}
                             </>
                         )}
-                    </div>
+                    </motion.div>
                 </div>
             )}
         </div>
