@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import prescriptionService from "../../api/services/prescription.service";
+//import prescriptionService from "../../api/services/prescription.service";
 import type { IPrescription } from "../../types/prescription.types";
 
 /**
