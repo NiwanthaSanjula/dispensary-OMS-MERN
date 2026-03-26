@@ -74,7 +74,7 @@ const PatientProfile = () => {
                     name: pat.name || "",
                     phone: pat.phone || "",
                     email: pat.email || "",
-                    bloodGroup: pat.booldGroup || "",
+                    bloodGroup: pat.bloodGroup || "",
                     address: pat.address || "",
                     allergies: pat.allergies?.join(", ") || "",
                 });
@@ -219,7 +219,7 @@ const PatientProfile = () => {
                             <div className="space-y-3">
                                 {[
                                     { label: "Gender", value: patient.gender },
-                                    { label: "Blood Group", value: patient.booldGroup },
+                                    { label: "Blood Group", value: patient.bloodGroup },
                                     { label: "Address", value: patient.address },
                                     {
                                         label: "Date of Birth",
